@@ -1,28 +1,27 @@
 .tile{
     user-select: none;
-    border: 1px solid rgba(81, 81, 81, 0.372);
-    width: 2rem;
-    height: 2rem;
+    border: 1px solid var(--border-color);
+    width: 1rem;
+    height: 1rem;
     padding: 0.5rem;
     color: transparent;
-    background-color: rgb(28, 24, 34);
+    background-color: var(--tile-hidden-background-color);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .tile.show{
-    background-color: aliceblue;
-    color: lime;
+    background-color: var(--tile-show-background-color);
     font-weight: 800;
     animation: pop 0.3s ease-in 0s 1 forwards;
-    color: rgb(255, 47, 47);
+    color: var(--tile-number-color);
 }
 
 .tile.show.mined{
     color: black;
     font-size: larger;
-    background-color: rgb(153, 255, 0);
+    background-color: var(--tile-mined-color);
 }
 
 @keyframes pop {
@@ -30,7 +29,7 @@
         border-radius: 50%;
         width: 0.5rem;
         height: 0.5rem;
-        background-color: rgb(255, 47, 47);
+        background-color: var(--tile-number-color);
     }to{
         border-radius: 0;
     }

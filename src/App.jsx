@@ -1,130 +1,43 @@
 import { useState } from "react";
 import Board from "./components/board/board";
-import BoardHeader from "./components/board-header/board-header";
+import BoardInfoBar from "./components/board-infobar/board-infobar";
+import {
+  generateEmptyBoard,
+  generateMineCoordinates,
+  mineTheBoard,
+} from "./utils/boardCreation";
+
+import { getNeighbors, countNearbybombs } from "./utils/boardManipulation";
 
 function App() {
-  const generateEmptyBoard = (numberOfRows, numberOfColumns) => {
-    const board = [];
-    for (let i = 0; i < numberOfRows; i++) {
-      let row = [];
-      for (let j = 0; j < numberOfColumns; j++) {
-        row.push({
-          content: " ",
-          revealed: false,
-          coordinates: {
-            x: i,
-            y: j,
-          },
-          numberOfBombs: 0,
-          hasBeenVisited: false,
-        });
-      }
-      board.push(row);
-    }
-    return board;
-  };
-
-  const getRandomInteger = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
-  const generateMineCoordinates = (numberOfBombs, row, col) => {
-    const bombCoordinates = [];
-    const alreadyMined = new Set();
-
-    for (let i = 0; i < numberOfBombs; i++) {
-      let x = getRandomInteger(0, row - 1);
-      let y = getRandomInteger(0, col - 1);
-
-      while (alreadyMined.has(`${x}|${y}`)) {
-        x = getRandomInteger(0, row - 1);
-        y = getRandomInteger(0, col - 1);
-      }
-
-      alreadyMined.add(`${x}|${y}`);
-
-      bombCoordinates.push({
-        x: x,
-        y: y,
-      });
-    }
-    return bombCoordinates;
-  };
-
-  const mineTheBoard = (coordinates, boardToMine) => {
-    for (let coordinate of coordinates) {
-      boardToMine[coordinate.x][coordinate.y].content = "B";
-    }
-  };
-
-  const getNeighbors = (i, j, myBoard) => {
-    const rows = myBoard.length;
-    const cols = myBoard[0].length;
-    const neighbors = [];
-
-    for (let x = i - 1; x <= i + 1; x++) {
-      for (let y = j - 1; y <= j + 1; y++) {
-        if (x >= 0 && x < rows && y >= 0 && y < cols && !(x === i && y === j)) {
-          neighbors.push([x, y]);
-        }
-      }
-    }
-    return neighbors;
-  };
-
-  const countNearbybombs = (x, y, boardToFill) => {
-    const neighbors = getNeighbors(x, y, boardToFill);
-
-    for (let element of neighbors) {
-      if (boardToFill[element[0]][element[1]].content === " ") {
-        boardToFill[element[0]][element[1]].numberOfBombs += 1;
-      }
-    }
-  };
-
   const prepBoard = (defaultBoard, bombsCoordinates) => {
     for (let coordinates of bombsCoordinates) {
       countNearbybombs(coordinates.x, coordinates.y, defaultBoard);
     }
   };
 
-  const [boardObject, setBoardObject] = useState({
+  const BOARD_OJECT = {
     dimensions: {
-      row: 10,
-      column: 20,
+      row: 15,
+      column: 30,
     },
-    numberOfBombs: 30,
-  });
-
-  const isAllSafeSquareRevealed = () => {
-    let counter = 0;
-    for (let row of board) {
-      for (let element of row) {
-        counter += element.revealed && element.content === " ";
-      }
-    }
-    return (
-      counter ===
-      boardObject.dimensions.row * boardObject.dimensions.column -
-        boardObject.numberOfBombs
-    );
+    numberOfBombs: 50,
   };
 
-  const empty_board = generateEmptyBoard(
-    boardObject.dimensions.row,
-    boardObject.dimensions.column
+  const EMPTY_BOARD = generateEmptyBoard(
+    BOARD_OJECT.dimensions.row,
+    BOARD_OJECT.dimensions.column
   );
-  const bombCoordinates = generateMineCoordinates(
-    boardObject.numberOfBombs,
-    boardObject.dimensions.row,
-    boardObject.dimensions.column
+  const BOMB_COORDINATES = generateMineCoordinates(
+    BOARD_OJECT.numberOfBombs,
+    BOARD_OJECT.dimensions.row,
+    BOARD_OJECT.dimensions.column
   );
 
-  mineTheBoard(bombCoordinates, empty_board);
+  mineTheBoard(BOMB_COORDINATES, EMPTY_BOARD);
+  prepBoard(EMPTY_BOARD, BOMB_COORDINATES);
 
-  prepBoard(empty_board, bombCoordinates);
-
-  const [board, setBoard] = useState(empty_board);
+  const [board, setBoard] = useState(EMPTY_BOARD);
   const [gameOver, setGameOver] = useState(false);
   const [gameOverMessage, setGameOverMessage] = useState("");
 
@@ -139,16 +52,30 @@ function App() {
     setBoard(...board);
   };
 
+  const isAllSafeSquareRevealed = () => {
+    let counter = 0;
+    for (let row of board) {
+      for (let element of row) {
+        counter += element.revealed && element.content === " ";
+      }
+    }
+    return (
+      counter ===
+      BOARD_OJECT.dimensions.row * BOARD_OJECT.dimensions.column -
+        BOARD_OJECT.numberOfBombs
+    );
+  };
+
   const revealTile = (coordinates) => {
     if (gameOver) {
       return;
     }
     if (board[coordinates.x][coordinates.y].content === "B") {
-      setGameOverMessage("You lose");
-      revealAllBombs(bombCoordinates);
+      setGameOverMessage("Game over");
+      revealAllBombs(BOMB_COORDINATES);
       setGameOver(true);
     }
-    dfs(coordinates.x, coordinates.y);
+    explore(coordinates.x, coordinates.y);
     const newBoard = [...board];
     setBoard(newBoard);
     if (isAllSafeSquareRevealed()) {
@@ -158,7 +85,8 @@ function App() {
     }
   };
 
-  const dfs = (x, y) => {
+  //it's a dfs function that handles the way tiles and their neighbor are revealed when clicked on
+  const explore = (x, y) => {
     let not_visited = getNeighbors(x, y, board);
     board[x][y].revealed = true;
     if (board[x][y].content === "B") {
@@ -169,7 +97,7 @@ function App() {
     }
     board[x][y].hasBeenVisited = true;
     for (let coord of not_visited) {
-      dfs(coord[0], coord[1]);
+      explore(coord[0], coord[1]);
     }
     return true;
   };
@@ -177,33 +105,34 @@ function App() {
   return (
     <div className="container">
       <div className="wrapper">
-        <BoardHeader
-          numberOfbombs={boardObject.numberOfBombs}
-          message={gameOverMessage}
-        />
         <Board board={board} revealFunction={revealTile} />
-        <footer className="board-footer">
+        <BoardInfoBar
+          numberOfbombs={BOARD_OJECT.numberOfBombs}
+          gameOver={gameOver}
+        />
+        {/* <footer className="board-footer">
           <button
+            className="regenerate-button"
             onClick={() => {
               setGameOver(false);
               setGameOverMessage("");
-              const empty_board = generateEmptyBoard(
-                boardObject.dimensions.row,
-                boardObject.dimensions.column
+              const EMPTY_BOARD = generateEmptyBoard(
+                BOARD_OJECT.dimensions.row,
+                BOARD_OJECT.dimensions.column
               );
-              const bombCoordinates = generateMineCoordinates(
-                boardObject.numberOfBombs,
-                boardObject.dimensions.row,
-                boardObject.dimensions.column
+              const BOMB_COORDINATES = generateMineCoordinates(
+                BOARD_OJECT.numberOfBombs,
+                BOARD_OJECT.dimensions.row,
+                BOARD_OJECT.dimensions.column
               );
-              mineTheBoard(bombCoordinates, empty_board);
-              prepBoard(empty_board, bombCoordinates);
-              setBoard(empty_board);
+              mineTheBoard(BOMB_COORDINATES, EMPTY_BOARD);
+              prepBoard(EMPTY_BOARD, BOMB_COORDINATES);
+              setBoard(EMPTY_BOARD);
             }}
           >
             Regenerate
           </button>
-        </footer>
+        </footer> */}
       </div>
     </div>
   );
