@@ -6,16 +6,16 @@
     padding: 0.5rem;
     color: transparent;
     background-color: rgb(28, 24, 34);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .tile.show{
     background-color: aliceblue;
     color: lime;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-weight: 800;
-    animation: pop 0.2s ease-in 0s 1 forwards;
+    animation: pop 0.3s ease-in 0s 1 forwards;
     color: rgb(255, 47, 47);
 }
 
@@ -31,8 +31,7 @@
         width: 0.5rem;
         height: 0.5rem;
         background-color: rgb(255, 47, 47);
-    }
-    to{
+    }to{
         border-radius: 0;
     }
 }

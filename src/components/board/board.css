@@ -1,8 +1,19 @@
 .board{
-    padding: 1rem;
+    padding: 1rem 0;
     display: grid;
     grid-template-columns: repeat(20, 3rem);
     grid-template-rows: repeat(10, 3rem);
     align-items: center;
     justify-content: center;
+}
+
+.board-wrapper{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid red;
+}
+
+.board-footer button{
+    padding: 1rem;
+    width: 100%;
 }

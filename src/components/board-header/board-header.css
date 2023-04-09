@@ -1,0 +1,19 @@
+.board-header *{
+    color: white;
+}
+
+.board-header{
+    border: 1px solid rgba(74, 64, 64, 0.294);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-content: space-between;
+    width: 925px;
+    padding: 1rem;
+}
+
+.bombs-counter{
+    background-color: aliceblue;
+    padding: 1rem;
+    color: black;
+}

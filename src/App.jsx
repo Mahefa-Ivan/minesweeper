@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Board from "./components/board/board";
+import BoardHeader from "./components/board-header/board-header";
 
 function App() {
   const generateEmptyBoard = (numberOfRows, numberOfColumns) => {
@@ -87,8 +88,37 @@ function App() {
     }
   };
 
-  const empty_board = generateEmptyBoard(10, 20);
-  const bombCoordinates = generateMineCoordinates(30, 10, 20);
+  const [boardObject, setBoardObject] = useState({
+    dimensions: {
+      row: 10,
+      column: 20,
+    },
+    numberOfBombs: 30,
+  });
+
+  const isAllSafeSquareRevealed = () => {
+    let counter = 0;
+    for (let row of board) {
+      for (let element of row) {
+        counter += element.revealed && element.content === " ";
+      }
+    }
+    return (
+      counter ===
+      boardObject.dimensions.row * boardObject.dimensions.column -
+        boardObject.numberOfBombs
+    );
+  };
+
+  const empty_board = generateEmptyBoard(
+    boardObject.dimensions.row,
+    boardObject.dimensions.column
+  );
+  const bombCoordinates = generateMineCoordinates(
+    boardObject.numberOfBombs,
+    boardObject.dimensions.row,
+    boardObject.dimensions.column
+  );
 
   mineTheBoard(bombCoordinates, empty_board);
 
@@ -96,6 +126,7 @@ function App() {
 
   const [board, setBoard] = useState(empty_board);
   const [gameOver, setGameOver] = useState(false);
+  const [gameOverMessage, setGameOverMessage] = useState("");
 
   const revealAllBombs = () => {
     for (let row of board) {
@@ -113,12 +144,18 @@ function App() {
       return;
     }
     if (board[coordinates.x][coordinates.y].content === "B") {
+      setGameOverMessage("You lose");
       revealAllBombs(bombCoordinates);
       setGameOver(true);
     }
     dfs(coordinates.x, coordinates.y);
     const newBoard = [...board];
     setBoard(newBoard);
+    if (isAllSafeSquareRevealed()) {
+      setGameOverMessage("You win");
+      setGameOver(true);
+      return;
+    }
   };
 
   const dfs = (x, y) => {
@@ -139,7 +176,35 @@ function App() {
 
   return (
     <div className="container">
-      <Board board={board} revealFunction={revealTile} />
+      <div className="wrapper">
+        <BoardHeader
+          numberOfbombs={boardObject.numberOfBombs}
+          message={gameOverMessage}
+        />
+        <Board board={board} revealFunction={revealTile} />
+        <footer className="board-footer">
+          <button
+            onClick={() => {
+              setGameOver(false);
+              setGameOverMessage("");
+              const empty_board = generateEmptyBoard(
+                boardObject.dimensions.row,
+                boardObject.dimensions.column
+              );
+              const bombCoordinates = generateMineCoordinates(
+                boardObject.numberOfBombs,
+                boardObject.dimensions.row,
+                boardObject.dimensions.column
+              );
+              mineTheBoard(bombCoordinates, empty_board);
+              prepBoard(empty_board, bombCoordinates);
+              setBoard(empty_board);
+            }}
+          >
+            Regenerate
+          </button>
+        </footer>
+      </div>
     </div>
   );
 }
