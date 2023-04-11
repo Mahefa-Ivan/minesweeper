@@ -1,0 +1,30 @@
+.overlay{
+    background-color: rgba(0, 0, 0, 0.582);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.modal{
+    border: 1px solid red;
+    padding: 1rem;
+    min-width: 400px;
+    position: fixed;
+    z-index: 100000;
+    background-color: rgb(39, 39, 39);
+    color: white;
+}
+
+.modal__row{
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+}
+
+.modal__close-button{
+    position: absolute;
+    right: 1rem;
+}

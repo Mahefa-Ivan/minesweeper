@@ -12,6 +12,7 @@ export const generateEmptyBoard = (numberOfRows, numberOfColumns) => {
         },
         numberOfBombs: 0,
         hasBeenVisited: false,
+        marked: false,
       });
     }
     board.push(row);

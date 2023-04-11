@@ -1,14 +1,22 @@
 import "./board.css";
 import Tile from "../tile/tile";
 
-export default function Board({ board, revealFunction }) {
+export default function Board({ board, revealFunction, markingFunction }) {
   const renderBoardTiles = () => {
     //map the board matrix to the view
     const viewBoard = [];
+    console.log(board);
     for (let row of board) {
       viewBoard.push(
         row.map((element, index) => {
-          return <Tile self={element} key={index} onclick={revealFunction} />;
+          return (
+            <Tile
+              self={element}
+              key={index}
+              onclick={revealFunction}
+              handelRightClick={markingFunction}
+            />
+          );
         })
       );
     }

@@ -1,12 +1,7 @@
 import "./tile.css";
 import { GiTellerMine } from "react-icons/gi";
 
-export default function Tile({ self, onclick }) {
-  const handleClick = (event) => {
-    event.preventDefault();
-    console.log(`right cliked: ${self}`);
-  };
-
+export default function Tile({ self, onclick, handelRightClick }) {
   const getClassName = () => {
     let className = "";
     if (self.revealed) {
@@ -14,6 +9,9 @@ export default function Tile({ self, onclick }) {
     }
     if (self.content === "B") {
       className += " mined";
+    }
+    if (self.marked) {
+      className += " marked";
     }
     return `tile ${className}`;
   };
@@ -31,10 +29,15 @@ export default function Tile({ self, onclick }) {
 
   return (
     <div
-      onContextMenu={handleClick}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        handelRightClick(self.coordinates);
+      }}
       className={getClassName()}
       onClick={() => {
-        onclick(self.coordinates);
+        if (!self.marked) {
+          onclick(self.coordinates);
+        }
       }}
     >
       {getContent()}

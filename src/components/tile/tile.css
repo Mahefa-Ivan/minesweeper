@@ -11,6 +11,14 @@
     justify-content: center;
 }
 
+.tile.mined *{
+    color: transparent;
+}
+
+.tile.marked{
+    background-color: var(--tile-number-color);
+}
+
 .tile.show{
     background-color: var(--tile-show-background-color);
     font-weight: 800;
@@ -22,6 +30,11 @@
     color: black;
     font-size: larger;
     background-color: var(--tile-mined-color);
+}
+
+
+.tile.show.mined *{
+    color: black !important;
 }
 
 @keyframes pop {

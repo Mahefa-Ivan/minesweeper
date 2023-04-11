@@ -6,3 +6,7 @@
     gap: 1rem;
     justify-content: center;
 }
+
+.counter *{
+    color: black;
+}

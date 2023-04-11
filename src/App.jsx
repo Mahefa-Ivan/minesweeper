@@ -1,6 +1,8 @@
 import { useState } from "react";
+
 import Board from "./components/board/board";
 import BoardInfoBar from "./components/board-infobar/board-infobar";
+
 import {
   generateEmptyBoard,
   generateMineCoordinates,
@@ -16,7 +18,7 @@ function App() {
     }
   };
 
-  const BOARD_OJECT = {
+  const BOARD_PROPERTY_OBJECT = {
     dimensions: {
       row: 15,
       column: 30,
@@ -24,17 +26,22 @@ function App() {
     numberOfBombs: 50,
   };
 
+  const [numberOfBombs, setNumberOfBombs] = useState(
+    BOARD_PROPERTY_OBJECT.numberOfBombs
+  );
+
   const EMPTY_BOARD = generateEmptyBoard(
-    BOARD_OJECT.dimensions.row,
-    BOARD_OJECT.dimensions.column
+    BOARD_PROPERTY_OBJECT.dimensions.row,
+    BOARD_PROPERTY_OBJECT.dimensions.column
   );
   const BOMB_COORDINATES = generateMineCoordinates(
-    BOARD_OJECT.numberOfBombs,
-    BOARD_OJECT.dimensions.row,
-    BOARD_OJECT.dimensions.column
+    BOARD_PROPERTY_OBJECT.numberOfBombs,
+    BOARD_PROPERTY_OBJECT.dimensions.row,
+    BOARD_PROPERTY_OBJECT.dimensions.column
   );
 
   mineTheBoard(BOMB_COORDINATES, EMPTY_BOARD);
+  //this is the function that handles the way nearby bombs are counted
   prepBoard(EMPTY_BOARD, BOMB_COORDINATES);
 
   const [board, setBoard] = useState(EMPTY_BOARD);
@@ -61,8 +68,9 @@ function App() {
     }
     return (
       counter ===
-      BOARD_OJECT.dimensions.row * BOARD_OJECT.dimensions.column -
-        BOARD_OJECT.numberOfBombs
+      BOARD_PROPERTY_OBJECT.dimensions.row *
+        BOARD_PROPERTY_OBJECT.dimensions.column -
+        BOARD_PROPERTY_OBJECT.numberOfBombs
     );
   };
 
@@ -102,37 +110,45 @@ function App() {
     return true;
   };
 
+  const resetFunction = () => {
+    const NEW_BOARD = generateEmptyBoard(
+      BOARD_PROPERTY_OBJECT.dimensions.row,
+      BOARD_PROPERTY_OBJECT.dimensions.column
+    );
+    const BOMB_COORDINATES = generateMineCoordinates(
+      BOARD_PROPERTY_OBJECT.numberOfBombs,
+      BOARD_PROPERTY_OBJECT.dimensions.row,
+      BOARD_PROPERTY_OBJECT.dimensions.column
+    );
+    mineTheBoard(BOMB_COORDINATES, NEW_BOARD);
+    prepBoard(NEW_BOARD, BOMB_COORDINATES);
+    console.log("infinite loop?");
+    setGameOver(false);
+    setBoard(NEW_BOARD);
+  };
+
+  const markFunction = (coordinates) => {
+    const { x, y } = coordinates;
+    board[x][y].marked = !board[x][y].marked;
+    setBoard([...board]);
+  };
+
   return (
     <div className="container">
+      {/* <PostGameForm showModal={gameOver} message={"modal test"} /> */}
       <div className="wrapper">
-        <Board board={board} revealFunction={revealTile} />
-        <BoardInfoBar
-          numberOfbombs={BOARD_OJECT.numberOfBombs}
-          gameOver={gameOver}
+        <Board
+          board={board}
+          revealFunction={revealTile}
+          bombCountingFunction={setNumberOfBombs}
+          markingFunction={markFunction}
+          numberOfbombs={numberOfBombs}
         />
-        {/* <footer className="board-footer">
-          <button
-            className="regenerate-button"
-            onClick={() => {
-              setGameOver(false);
-              setGameOverMessage("");
-              const EMPTY_BOARD = generateEmptyBoard(
-                BOARD_OJECT.dimensions.row,
-                BOARD_OJECT.dimensions.column
-              );
-              const BOMB_COORDINATES = generateMineCoordinates(
-                BOARD_OJECT.numberOfBombs,
-                BOARD_OJECT.dimensions.row,
-                BOARD_OJECT.dimensions.column
-              );
-              mineTheBoard(BOMB_COORDINATES, EMPTY_BOARD);
-              prepBoard(EMPTY_BOARD, BOMB_COORDINATES);
-              setBoard(EMPTY_BOARD);
-            }}
-          >
-            Regenerate
-          </button>
-        </footer> */}
+        <BoardInfoBar
+          numberOfbombs={numberOfBombs}
+          gameOver={gameOver}
+          onReset={resetFunction}
+        />
       </div>
     </div>
   );
