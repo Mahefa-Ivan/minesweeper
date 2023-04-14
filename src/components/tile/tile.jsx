@@ -2,7 +2,12 @@ import "./tile.css";
 import { GiTellerMine } from "react-icons/gi";
 import { TfiFlag } from "react-icons/tfi";
 
-export default function Tile({ self, onclick, handelRightClick }) {
+export default function Tile({
+  self,
+  onclick,
+  handelRightClick,
+  handleMaintainedClick,
+}) {
   const getClassName = () => {
     let className = "";
     if (self.revealed) {
@@ -31,14 +36,30 @@ export default function Tile({ self, onclick, handelRightClick }) {
     return " ";
   };
 
+  /*  clicker.mousedown(function(){
+    timeout = setInterval(function(){
+        clicker.text(count++);
+    }, 500);
+
+    return false;
+  });
+
+  $(document).mouseup(function(){
+      clearInterval(timeout);
+      return false;
+  }); */
+
   return (
     <div
+      className={getClassName()}
       onContextMenu={(event) => {
         event.preventDefault();
         handelRightClick(self.coordinates);
       }}
-      className={getClassName()}
-      onClick={() => {
+      onClick={(event) => {
+        if (event.shiftKey && self.revealed) {
+          handleMaintainedClick(self.coordinates);
+        }
         if (!self.marked) {
           onclick(self.coordinates);
         }

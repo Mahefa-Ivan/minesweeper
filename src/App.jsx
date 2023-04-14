@@ -153,6 +153,29 @@ function App() {
     setBoard([...board]);
   };
 
+  const handleMaintainedClick = (coordinates) => {
+    const { x, y } = coordinates;
+    const neighbors = getNeighbors(x, y, board);
+    let counter = 0;
+    for (let neighbor of neighbors) {
+      if (board[neighbor[0]][neighbor[1]].marked) {
+        counter += 1;
+      }
+    }
+    if (counter === board[x][y].numberOfBombs) {
+      for (let neighbor of neighbors) {
+        if (board[neighbor[0]][neighbor[1]].content === "B") {
+          setGameState("game over");
+          revealAllBombs(BOMB_COORDINATES);
+          setGameOver(true);
+        }
+        if (!board[neighbor[0]][neighbor[1]].marked) {
+          board[neighbor[0]][neighbor[1]].revealed = true;
+        }
+      }
+    }
+  };
+
   return (
     <div className="container">
       <div className="wrapper">
@@ -168,6 +191,7 @@ function App() {
         <Board
           board={board}
           onTileClicked={handleTileClicked}
+          onTileMaintainedClick={handleMaintainedClick}
           bombCountingFunction={setNumberOfBombs}
           onTileRightClicked={handleTileRightClicked}
           numberOfbombs={numberOfBombs}
