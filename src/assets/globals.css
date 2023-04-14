@@ -35,6 +35,19 @@ body, html{
   background-color: var(--primary);
 }
 
+.game-state-message * {
+  font-size: 2rem;
+  color: rgb(231, 175, 19);
+}
+
+.game-state-message{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--tile-hidden-background-color);
+  padding: 0.5rem;
+}
+
 .regenerate-button{
   background-color: rgb(255, 0, 38);
   color: white;

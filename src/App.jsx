@@ -4,6 +4,12 @@ import Board from "./components/board/board";
 import BoardInfoBar from "./components/board-infobar/board-infobar";
 
 import {
+  BsEmojiSmileFill,
+  BsEmojiDizzyFill,
+  BsEmojiSunglassesFill,
+} from "react-icons/bs";
+
+import {
   generateEmptyBoard,
   generateMineCoordinates,
   mineTheBoard,
@@ -79,7 +85,7 @@ function App() {
       return;
     }
     if (board[coordinates.x][coordinates.y].content === "B") {
-      setGameOverMessage("Game over");
+      setGameOverMessage("game over");
       revealAllBombs(BOMB_COORDINATES);
       setGameOver(true);
     }
@@ -87,7 +93,7 @@ function App() {
     const newBoard = [...board];
     setBoard(newBoard);
     if (isAllSafeSquareRevealed()) {
-      setGameOverMessage("You win");
+      setGameOverMessage("you win");
       setGameOver(true);
       return;
     }
@@ -125,6 +131,7 @@ function App() {
     console.log("infinite loop?");
     setGameOver(false);
     setBoard(NEW_BOARD);
+    setGameOverMessage(" ");
   };
 
   const markFunction = (coordinates) => {
@@ -137,6 +144,23 @@ function App() {
     <div className="container">
       {/* <PostGameForm showModal={gameOver} message={"modal test"} /> */}
       <div className="wrapper">
+        <div className="game-state-message">
+          {gameOverMessage === "game over" ? (
+            <BsEmojiDizzyFill />
+          ) : gameOverMessage === "you win" ? (
+            <BsEmojiSunglassesFill />
+          ) : (
+            <BsEmojiSmileFill />
+          )}
+        </div>
+        {/* <button
+          onClick={() => {
+            setGameOver(true);
+            setGameOverMessage("you win");
+          }}
+        >
+          magic win
+        </button> */}
         <Board
           board={board}
           revealFunction={revealTile}

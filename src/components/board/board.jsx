@@ -5,7 +5,6 @@ export default function Board({ board, revealFunction, markingFunction }) {
   const renderBoardTiles = () => {
     //map the board matrix to the view
     const viewBoard = [];
-    console.log(board);
     for (let row of board) {
       viewBoard.push(
         row.map((element, index) => {

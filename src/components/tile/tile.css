@@ -26,6 +26,38 @@
     color: var(--tile-number-color);
 }
 
+.tile--1.show{
+    color: blue;
+}
+
+.tile--2.show{
+    color: green;
+}
+
+.tile--3.show{
+    color: red;
+}
+
+.tile--4.show{
+    color: purple;
+}
+
+.tile--5.show{
+    color: maroon;
+}
+
+.tile--6.show{
+    color: turquoise;
+}
+
+.tile--7.show{
+    color: black;
+}
+
+.tile--8.show{
+    color: gray;
+}
+
 .tile.show.mined{
     color: black;
     font-size: larger;
