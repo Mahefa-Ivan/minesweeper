@@ -11,15 +11,12 @@ export default function Tile({ self, onclick, handelRightClick }) {
     if (self.content === "B") {
       className += " mined";
     }
-    /*  if (self.marked) {
-      className += " marked";
-    } */
     return `tile ${className} tile--${self.numberOfBombs}`;
   };
 
   const getContent = () => {
     /* if tile has a bomb show a bomb icon else show the number of nearby bomb or nothing if no nearby bombs */
-    if (self.marked) {
+    if (self.marked && !self.revealed) {
       return <TfiFlag />;
     }
     if (self.content === "B") {

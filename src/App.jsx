@@ -53,6 +53,7 @@ function App() {
   const [board, setBoard] = useState(EMPTY_BOARD);
   const [gameOver, setGameOver] = useState(false);
   const [gameOverMessage, setGameOverMessage] = useState("");
+  const [resetTimer, setResetTimer] = useState(false);
 
   const revealAllBombs = () => {
     for (let row of board) {
@@ -172,6 +173,7 @@ function App() {
           numberOfbombs={numberOfBombs}
           gameOver={gameOver}
           onReset={resetFunction}
+          resetTimer={resetTimer}
         />
       </div>
     </div>
