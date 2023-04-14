@@ -11,6 +11,9 @@ export default function Tile({ self, onclick, handelRightClick }) {
     if (self.content === "B") {
       className += " mined";
     }
+    if (self.marked && !self.revealed) {
+      className += " marked";
+    }
     return `tile ${className} tile--${self.numberOfBombs}`;
   };
 

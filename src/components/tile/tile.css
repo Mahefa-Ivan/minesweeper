@@ -15,8 +15,8 @@
     color: transparent;
 }
 
-.tile.marked{
-    background-color: var(--tile-number-color);
+.tile.marked *{
+    color: white !important;
 }
 
 .tile.show{

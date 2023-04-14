@@ -2,13 +2,15 @@ import { BsClock } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import "./timer.css";
 
-export default function Timer({ stopCondition }) {
+export default function Timer({ stopCondition, time }) {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (!stopCondition) {
         setSeconds(seconds + 1);
+      } else {
+        setSeconds(0);
       }
     }, 1000);
 

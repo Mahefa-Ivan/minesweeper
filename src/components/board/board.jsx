@@ -1,9 +1,9 @@
 import "./board.css";
 import Tile from "../tile/tile";
 
-export default function Board({ board, revealFunction, markingFunction }) {
+export default function Board({ board, onTileClicked, onTileRightClicked }) {
   const renderBoardTiles = () => {
-    //map the board matrix to the view
+    //map the board to the view
     const viewBoard = [];
     for (let row of board) {
       viewBoard.push(
@@ -12,8 +12,8 @@ export default function Board({ board, revealFunction, markingFunction }) {
             <Tile
               self={element}
               key={index}
-              onclick={revealFunction}
-              handelRightClick={markingFunction}
+              onclick={onTileClicked}
+              handelRightClick={onTileRightClicked}
             />
           );
         })

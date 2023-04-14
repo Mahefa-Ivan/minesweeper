@@ -6,14 +6,14 @@
     }
 
     - difficulty selection: {
-        now that I think of it this should have been among the top priority task lol
+        now that I think of it this should have been among the top priority task
     }
+
+    - timer should reset on reset button clicked
 
 # bugs to fix:
 
-    - cannot mark/flag tiles with a bomb {
-        marking cells kinda worked better than expected
-    }
+    - no bugs to fix
 
 # Other:
 

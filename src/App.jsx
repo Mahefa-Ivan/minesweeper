@@ -18,12 +18,13 @@ import {
 import { getNeighbors, countNearbybombs } from "./utils/boardManipulation";
 
 function App() {
-  const prepBoard = (defaultBoard, bombsCoordinates) => {
+  const assignCellBombCount = (defaultBoard, bombsCoordinates) => {
     for (let coordinates of bombsCoordinates) {
       countNearbybombs(coordinates.x, coordinates.y, defaultBoard);
     }
   };
 
+  //an object that defines how the board should look like
   const BOARD_PROPERTY_OBJECT = {
     dimensions: {
       row: 15,
@@ -40,6 +41,7 @@ function App() {
     BOARD_PROPERTY_OBJECT.dimensions.row,
     BOARD_PROPERTY_OBJECT.dimensions.column
   );
+
   const BOMB_COORDINATES = generateMineCoordinates(
     BOARD_PROPERTY_OBJECT.numberOfBombs,
     BOARD_PROPERTY_OBJECT.dimensions.row,
@@ -47,13 +49,11 @@ function App() {
   );
 
   mineTheBoard(BOMB_COORDINATES, EMPTY_BOARD);
-  //this is the function that handles the way nearby bombs are counted
-  prepBoard(EMPTY_BOARD, BOMB_COORDINATES);
+  assignCellBombCount(EMPTY_BOARD, BOMB_COORDINATES);
 
   const [board, setBoard] = useState(EMPTY_BOARD);
   const [gameOver, setGameOver] = useState(false);
-  const [gameOverMessage, setGameOverMessage] = useState("");
-  const [resetTimer, setResetTimer] = useState(false);
+  const [gameState, setGameState] = useState("");
 
   const revealAllBombs = () => {
     for (let row of board) {
@@ -66,7 +66,7 @@ function App() {
     setBoard(...board);
   };
 
-  const isAllSafeSquareRevealed = () => {
+  const allSafeSquareClicked = () => {
     let counter = 0;
     for (let row of board) {
       for (let element of row) {
@@ -81,20 +81,20 @@ function App() {
     );
   };
 
-  const revealTile = (coordinates) => {
+  const handleTileClicked = (coordinates) => {
     if (gameOver) {
       return;
     }
     if (board[coordinates.x][coordinates.y].content === "B") {
-      setGameOverMessage("game over");
+      setGameState("game over");
       revealAllBombs(BOMB_COORDINATES);
       setGameOver(true);
     }
     explore(coordinates.x, coordinates.y);
     const newBoard = [...board];
     setBoard(newBoard);
-    if (isAllSafeSquareRevealed()) {
-      setGameOverMessage("you win");
+    if (allSafeSquareClicked()) {
+      setGameState("you win");
       setGameOver(true);
       return;
     }
@@ -118,62 +118,64 @@ function App() {
   };
 
   const resetFunction = () => {
+    setGameState(" ");
+    setNumberOfBombs(BOARD_PROPERTY_OBJECT.numberOfBombs);
+
     const NEW_BOARD = generateEmptyBoard(
       BOARD_PROPERTY_OBJECT.dimensions.row,
       BOARD_PROPERTY_OBJECT.dimensions.column
     );
+
     const BOMB_COORDINATES = generateMineCoordinates(
       BOARD_PROPERTY_OBJECT.numberOfBombs,
       BOARD_PROPERTY_OBJECT.dimensions.row,
       BOARD_PROPERTY_OBJECT.dimensions.column
     );
+
     mineTheBoard(BOMB_COORDINATES, NEW_BOARD);
-    prepBoard(NEW_BOARD, BOMB_COORDINATES);
-    console.log("infinite loop?");
+    assignCellBombCount(NEW_BOARD, BOMB_COORDINATES);
+
     setGameOver(false);
     setBoard(NEW_BOARD);
-    setGameOverMessage(" ");
   };
 
-  const markFunction = (coordinates) => {
+  const handleTileRightClicked = (coordinates) => {
+    if (gameOver) {
+      return;
+    }
     const { x, y } = coordinates;
+    if (board[x][y].marked) {
+      setNumberOfBombs(numberOfBombs + 1);
+    } else {
+      setNumberOfBombs(numberOfBombs - 1);
+    }
     board[x][y].marked = !board[x][y].marked;
     setBoard([...board]);
   };
 
   return (
     <div className="container">
-      {/* <PostGameForm showModal={gameOver} message={"modal test"} /> */}
       <div className="wrapper">
         <div className="game-state-message">
-          {gameOverMessage === "game over" ? (
+          {gameState === "game over" ? (
             <BsEmojiDizzyFill />
-          ) : gameOverMessage === "you win" ? (
+          ) : gameState === "you win" ? (
             <BsEmojiSunglassesFill />
           ) : (
             <BsEmojiSmileFill />
           )}
         </div>
-        {/* <button
-          onClick={() => {
-            setGameOver(true);
-            setGameOverMessage("you win");
-          }}
-        >
-          magic win
-        </button> */}
         <Board
           board={board}
-          revealFunction={revealTile}
+          onTileClicked={handleTileClicked}
           bombCountingFunction={setNumberOfBombs}
-          markingFunction={markFunction}
+          onTileRightClicked={handleTileRightClicked}
           numberOfbombs={numberOfBombs}
         />
         <BoardInfoBar
           numberOfbombs={numberOfBombs}
           gameOver={gameOver}
           onReset={resetFunction}
-          resetTimer={resetTimer}
         />
       </div>
     </div>
