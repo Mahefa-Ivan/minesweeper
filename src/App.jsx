@@ -9,21 +9,11 @@ import {
   BsEmojiSunglassesFill,
 } from "react-icons/bs";
 
-import {
-  generateEmptyBoard,
-  generateMineCoordinates,
-  mineTheBoard,
-} from "./utils/boardCreation";
+import { getNeighbors, createNewBoard } from "./utils/boardCreation";
 
-import { getNeighbors, countNearbybombs } from "./utils/boardManipulation";
+import { revealAllBombs } from "./utils/boardManipulation";
 
 function App() {
-  const assignCellBombCount = (defaultBoard, bombsCoordinates) => {
-    for (let coordinates of bombsCoordinates) {
-      countNearbybombs(coordinates.x, coordinates.y, defaultBoard);
-    }
-  };
-
   //an object that defines how the board should look like
   const BOARD_PROPERTY_OBJECT = {
     dimensions: {
@@ -37,42 +27,22 @@ function App() {
     BOARD_PROPERTY_OBJECT.numberOfBombs
   );
 
-  const EMPTY_BOARD = generateEmptyBoard(
-    BOARD_PROPERTY_OBJECT.dimensions.row,
-    BOARD_PROPERTY_OBJECT.dimensions.column
-  );
+  const BOARD_OBJECT = createNewBoard(BOARD_PROPERTY_OBJECT);
 
-  const BOMB_COORDINATES = generateMineCoordinates(
-    BOARD_PROPERTY_OBJECT.numberOfBombs,
-    BOARD_PROPERTY_OBJECT.dimensions.row,
-    BOARD_PROPERTY_OBJECT.dimensions.column
-  );
-
-  mineTheBoard(BOMB_COORDINATES, EMPTY_BOARD);
-  assignCellBombCount(EMPTY_BOARD, BOMB_COORDINATES);
-
-  const [board, setBoard] = useState(EMPTY_BOARD);
+  const [board, setBoard] = useState(BOARD_OBJECT.board);
   const [gameOver, setGameOver] = useState(false);
   const [gameState, setGameState] = useState("");
 
-  const revealAllBombs = () => {
-    for (let row of board) {
-      for (let element of row) {
-        if (element.content === "B") {
-          element.revealed = true;
-        }
-      }
-    }
-    setBoard(...board);
-  };
-
-  const allSafeSquareClicked = () => {
+  const allSafeSquareRevealed = () => {
     let counter = 0;
     for (let row of board) {
       for (let element of row) {
+        //add 1 if the tile is revealed and doesnt have any bomb in it
         counter += element.revealed && element.content === " ";
       }
     }
+
+    //number of safe square = total number of square - number of bombs
     return (
       counter ===
       BOARD_PROPERTY_OBJECT.dimensions.row *
@@ -81,22 +51,62 @@ function App() {
     );
   };
 
+  const endGame = () => {
+    setGameState("game over");
+    setBoard(revealAllBombs(board));
+    setGameOver(true);
+  };
+
   const handleTileClicked = (coordinates) => {
-    if (gameOver) {
-      return;
+    if (!gameOver) {
+      if (board[coordinates.x][coordinates.y].revealed) {
+        chord(coordinates);
+      }
+
+      //user got blown up?
+      if (board[coordinates.x][coordinates.y].content === "B") {
+        endGame();
+      }
+
+      //reveal all empty tiles up to the closest one with numberOfBomb > 0
+      explore(coordinates.x, coordinates.y);
+      setBoard([...board]);
+
+      if (allSafeSquareRevealed()) {
+        setGameState("you win");
+        setGameOver(true);
+      }
     }
-    if (board[coordinates.x][coordinates.y].content === "B") {
-      setGameState("game over");
-      revealAllBombs(BOMB_COORDINATES);
-      setGameOver(true);
+  };
+
+  /*chording in minesweeper is the act of clicking on an uncovered square to
+  uncover all eight adjacent squares if it has the correct number of flags (marked cells).*/
+  const chord = (coordinates) => {
+    const { x, y } = coordinates;
+    const neighbors = getNeighbors(x, y, board);
+    let counter = 0;
+
+    for (let neighbor of neighbors) {
+      if (
+        board[neighbor[0]][neighbor[1]].marked &&
+        !board[neighbor[0]][neighbor[1]].revealed
+      ) {
+        counter += 1;
+      }
     }
-    explore(coordinates.x, coordinates.y);
-    const newBoard = [...board];
-    setBoard(newBoard);
-    if (allSafeSquareClicked()) {
-      setGameState("you win");
-      setGameOver(true);
-      return;
+
+    if (counter === board[x][y].numberOfBombs) {
+      for (let neighbor of neighbors) {
+        if (
+          board[neighbor[0]][neighbor[1]].content === "B" &&
+          !board[neighbor[0]][neighbor[1]].marked
+        ) {
+          endGame();
+        }
+        if (!board[neighbor[0]][neighbor[1]].marked) {
+          board[neighbor[0]][neighbor[1]].revealed = true;
+        }
+      }
     }
   };
 
@@ -111,6 +121,7 @@ function App() {
       return true;
     }
     board[x][y].hasBeenVisited = true;
+    //reveal the clicked square and every other square up to the nearest one with a number of bombs > 0
     for (let coord of not_visited) {
       explore(coord[0], coord[1]);
     }
@@ -118,61 +129,25 @@ function App() {
   };
 
   const resetFunction = () => {
+    //everything goes back to default
+    const BOARD_OBJECT = createNewBoard(BOARD_PROPERTY_OBJECT);
     setGameState(" ");
     setNumberOfBombs(BOARD_PROPERTY_OBJECT.numberOfBombs);
-
-    const NEW_BOARD = generateEmptyBoard(
-      BOARD_PROPERTY_OBJECT.dimensions.row,
-      BOARD_PROPERTY_OBJECT.dimensions.column
-    );
-
-    const BOMB_COORDINATES = generateMineCoordinates(
-      BOARD_PROPERTY_OBJECT.numberOfBombs,
-      BOARD_PROPERTY_OBJECT.dimensions.row,
-      BOARD_PROPERTY_OBJECT.dimensions.column
-    );
-
-    mineTheBoard(BOMB_COORDINATES, NEW_BOARD);
-    assignCellBombCount(NEW_BOARD, BOMB_COORDINATES);
-
     setGameOver(false);
-    setBoard(NEW_BOARD);
+    setBoard(BOARD_OBJECT.board);
   };
 
   const handleTileRightClicked = (coordinates) => {
-    if (gameOver) {
-      return;
-    }
-    const { x, y } = coordinates;
-    if (board[x][y].marked) {
-      setNumberOfBombs(numberOfBombs + 1);
-    } else {
-      setNumberOfBombs(numberOfBombs - 1);
-    }
-    board[x][y].marked = !board[x][y].marked;
-    setBoard([...board]);
-  };
-
-  const handleMaintainedClick = (coordinates) => {
-    const { x, y } = coordinates;
-    const neighbors = getNeighbors(x, y, board);
-    let counter = 0;
-    for (let neighbor of neighbors) {
-      if (board[neighbor[0]][neighbor[1]].marked) {
-        counter += 1;
+    //flag the square if its not revealed
+    if (!gameOver && !board[coordinates.x][coordinates.y].revealed) {
+      const { x, y } = coordinates;
+      if (board[x][y].marked) {
+        setNumberOfBombs(numberOfBombs + 1);
+      } else {
+        setNumberOfBombs(numberOfBombs - 1);
       }
-    }
-    if (counter === board[x][y].numberOfBombs) {
-      for (let neighbor of neighbors) {
-        if (board[neighbor[0]][neighbor[1]].content === "B") {
-          setGameState("game over");
-          revealAllBombs(BOMB_COORDINATES);
-          setGameOver(true);
-        }
-        if (!board[neighbor[0]][neighbor[1]].marked) {
-          board[neighbor[0]][neighbor[1]].revealed = true;
-        }
-      }
+      board[x][y].marked = !board[x][y].marked;
+      setBoard([...board]);
     }
   };
 
@@ -191,7 +166,6 @@ function App() {
         <Board
           board={board}
           onTileClicked={handleTileClicked}
-          onTileMaintainedClick={handleMaintainedClick}
           bombCountingFunction={setNumberOfBombs}
           onTileRightClicked={handleTileRightClicked}
           numberOfbombs={numberOfBombs}

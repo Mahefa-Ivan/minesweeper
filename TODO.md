@@ -1,6 +1,6 @@
 # features implementations:
 
-    - Hold click to clear all nearby cells: {
+    - chording: {
         when clicking and holding on a cell, if the number of marked neighbors is equal to the number of
         bombs nearby, then trigger the reveal function of all neighbors
     }

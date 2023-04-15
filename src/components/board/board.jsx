@@ -1,12 +1,7 @@
 import "./board.css";
 import Tile from "../tile/tile";
 
-export default function Board({
-  board,
-  onTileClicked,
-  onTileRightClicked,
-  onTileMaintainedClick,
-}) {
+export default function Board({ board, onTileClicked, onTileRightClicked }) {
   const renderBoardTiles = () => {
     //map the board to the view
     const viewBoard = [];
@@ -19,7 +14,6 @@ export default function Board({
               key={index}
               onclick={onTileClicked}
               handelRightClick={onTileRightClicked}
-              handleMaintainedClick={onTileMaintainedClick}
             />
           );
         })

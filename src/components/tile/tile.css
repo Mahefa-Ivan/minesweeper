@@ -16,7 +16,7 @@
 }
 
 .tile.marked *{
-    color: white !important;
+    color: orange !important;
 }
 
 .tile.show{

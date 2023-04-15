@@ -2,7 +2,7 @@ import { BsClock } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import "./timer.css";
 
-export default function Timer({ stopCondition, time }) {
+export default function Timer({ stopCondition }) {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
@@ -20,6 +20,7 @@ export default function Timer({ stopCondition, time }) {
   return (
     <div className="timer">
       {<BsClock />}
+
       <span className="timer__seconds">{seconds}</span>
     </div>
   );
