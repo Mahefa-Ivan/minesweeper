@@ -20,9 +20,10 @@ function App() {
       row: 15,
       column: 30,
     },
-    numberOfBombs: 50,
+    numberOfBombs: 80,
   };
 
+  const [seconds, setSeconds] = useState(0);
   const [numberOfBombs, setNumberOfBombs] = useState(
     BOARD_PROPERTY_OBJECT.numberOfBombs
   );
@@ -135,6 +136,7 @@ function App() {
     setNumberOfBombs(BOARD_PROPERTY_OBJECT.numberOfBombs);
     setGameOver(false);
     setBoard(BOARD_OBJECT.board);
+    setSeconds(0);
   };
 
   const handleTileRightClicked = (coordinates) => {
@@ -174,6 +176,8 @@ function App() {
           numberOfbombs={numberOfBombs}
           gameOver={gameOver}
           onReset={resetFunction}
+          seconds={seconds}
+          setSeconds={setSeconds}
         />
       </div>
     </div>
